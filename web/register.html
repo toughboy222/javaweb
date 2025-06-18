@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 220162401030 史程昊</title>
+    <style>
+        /* ... CSS样式保持不变 ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background: url('https://liankao.net/uploads/allimg/221020/1U44R331-0.jpg') center/cover fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.98);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .register-title {
+            color: #333;
+            font-size: 28px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            position: relative;
+            text-align: center;
+        }
+        .register-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #eee;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* 稍微减小一点间距 */
+            position: relative;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        }
+
+        .main-register-btn {
+            background: #28a745; /* 注册按钮用绿色 */
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%; /* 让按钮宽度与输入框一致 */
+            display: block; /* 确保按钮占据整行 */
+            margin-top: 25px; /* 增加与上方元素的间距 */
+            transition: background-color 0.3s ease;
+        }
+        .main-register-btn:hover {
+            background-color: #218838; /* 鼠标悬停时深一点的绿色 */
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .login-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h1 class="register-title">创建您的掘金账户</h1>
+
+    <div class="input-group">
+        <input type="tel" id="username" name="username" placeholder="请输入手机号" required
+               pattern="1[3-9]\d{9}"
+               title="请输入有效的中国大陆手机号">
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="nickname" name="nickname" placeholder="请输入昵称 (2-20字符)" required
+               minlength="2" maxlength="20">
+    </div>
+
+    <div class="input-group">
+        <input type="password" id="password" name="password" placeholder="请输入密码 (至少6位)" required
+               minlength="6">
+    </div>
+
+    <div class="input-group">
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required
+               minlength="6">
+    </div>
+
+    <button class="main-register-btn" onclick="handleRegister()">立即注册</button>
+
+    <a href="login.html" class="login-link">已有账号？前往登录</a>
+
+</div>
+<script>
+    function handleRegister() {
+        const usernameInput = document.getElementById('username');
+        const nicknameInput = document.getElementById('nickname');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        const username = usernameInput.value.trim();
+        const nickname = nicknameInput.value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // --- 前端输入校验 (保持不变) ---
+        if (!username || !nickname || !password || !confirmPassword) {
+            alert("所有字段均为必填项！");
+            return;
+        }
+        if (!/^1[3-9]\d{9}$/.test(username)) {
+            alert("请输入有效的中国大陆手机号！");
+            usernameInput.focus();
+            return;
+        }
+        if (nickname.length < 2 || nickname.length > 20) {
+            alert("昵称长度应为 2 到 20 个字符！");
+            nicknameInput.focus();
+            return;
+        }
+        if (password.length < 6) {
+            alert("密码长度至少为 6 位！");
+            passwordInput.focus();
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("两次输入的密码不一致！");
+            confirmPasswordInput.focus();
+            confirmPasswordInput.value = '';
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append("username", username);
+        formData.append("nickname", nickname);
+        formData.append("password", password);
+
+        // 使用相对路径，确保在任何服务器上都能正确请求
+        fetch("RegisterServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+            .then(response => {
+                // ---【核心修改】: 优化错误处理逻辑 ---
+                if (response.ok) { // 当状态码是 2xx (例如 201 Created), response.ok 为 true
+                    return response.json();
+                } else {
+                    // 当状态码是 4xx 或 5xx, response.ok 为 false
+                    // 我们尝试解析后端返回的JSON错误信息
+                    return response.json().then(errData => {
+                        // 将从JSON中提取的错误信息抛出，这样 catch 块就能捕获到具体原因
+                        throw new Error(errData.error || `服务器返回了未知的错误，状态码：${response.status}`);
+                    }).catch(() => {
+                        // 如果后端返回的错误响应不是JSON格式，或者JSON解析失败
+                        throw new Error(`请求失败，服务器返回状态：${response.status}`);
+                    });
+                }
+            })
+            .then(result => {
+                // 这部分只会在 response.ok 为 true 时执行
+                if (result.success) {
+                    alert(result.message || "注册成功！将跳转到登录页面。");
+                    window.location.href = "login.html";
+                } else {
+                    // 处理后端返回 success:false 的情况（虽然我们当前的后端实现中不常有）
+                    alert(result.message || "注册失败，请检查输入信息。");
+                }
+            })
+            .catch(error => {
+                // 这个 catch 块现在能捕获到所有类型的错误
+                // 包括网络失败、JSON解析失败，以及我们从不OK的响应中手动抛出的具体错误信息
+                console.error("注册请求或处理失败：", error);
+                // 直接将错误信息弹窗显示给用户
+                alert(error.message);
+            });
+    }
+</script>
+</body>
+</html>

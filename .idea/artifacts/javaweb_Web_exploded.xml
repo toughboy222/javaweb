@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="javaweb:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/javaweb_Web_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="javaweb" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="eclipsesource.jaxrs.provider.gson" />
+          <element id="library" level="project" name="mysql-connector-j-9.3.0" />
+          <element id="library" level="project" name="javax.servlet-api-4.0.1" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="javaweb/web/Web" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情</title>
+    <link rel="stylesheet" href="main.css"> <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', sans-serif; /* */
+            background-color: #f9f9f9; /* */
+            color: #333; /* */
+            margin: 0; /* */
+            padding-top: 60px; /* 为固定导航栏预留空间 */ /* */
+        }
+        .article-outer-container {
+            padding: 20px 15px; /* */
+        }
+        .article-container {
+            max-width: 800px; /* */
+            margin-left: auto; /* */
+            margin-right: auto; /* */
+            padding: 25px 30px; /* */
+            background-color: #fff; /* */
+            border: 1px solid #eee; /* */
+            border-radius: 8px; /* */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* */
+        }
+        .article-full-title {
+            font-size: 2.2em; /* */
+            color: #333; /* */
+            margin-bottom: 15px; /* */
+            line-height: 1.3; /* */
+        }
+        .article-full-meta {
+            font-size: 0.9em; /* */
+            color: #777; /* */
+            margin-bottom: 25px; /* */
+            border-bottom: 1px solid #eee; /* */
+            padding-bottom: 15px; /* */
+        }
+        .article-full-meta span {
+            margin-right: 15px; /* */
+        }
+        .article-full-content {
+            font-size: 1.05em; /* */
+            line-height: 1.8; /* */
+            color: #444; /* */
+        }
+        /* Markdown 渲染后内容的样式 (与 publish.html 预览区类似) */
+        .article-full-content h1, .article-full-content h2, .article-full-content h3, .article-full-content h4, .article-full-content h5, .article-full-content h6 { margin-top: 1.8em; margin-bottom: 0.8em; line-height: 1.3; font-weight: 600; } /* */
+        .article-full-content h1 { font-size: 2em; } /* */
+        .article-full-content h2 { font-size: 1.7em; } /* */
+        .article-full-content h3 { font-size: 1.4em; } /* */
+        .article-full-content h4 { font-size: 1.2em; } /* */
+        .article-full-content p { margin-bottom: 1.2em; } /* */
+        .article-full-content ul, .article-full-content ol { margin-left: 2em; margin-bottom: 1em; padding-left: 0; } /* */
+        .article-full-content li { margin-bottom: 0.4em; } /* */
+        .article-full-content blockquote { margin: 1.5em 0; padding: 0.8em 1.2em; border-left: 5px solid #007bff; background-color: #f8f9fa; color: #555; } /* */
+        .article-full-content blockquote p:last-child { margin-bottom: 0; } /* */
+        .article-full-content pre { background-color: #2d2d2d; color: #f8f8f2; padding: 1em; border-radius: 5px; overflow-x: auto; margin-bottom: 1.5em; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.95em; } /* */
+        .article-full-content code { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; background-color: rgba(27,31,35,.05); padding: .2em .4em; margin: 0; font-size: 85%; border-radius: 3px; } /* */
+        .article-full-content pre code { background-color: transparent; padding: 0; margin: 0; font-size: inherit; border-radius: 0; color: inherit; } /* */
+        .article-full-content img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 0.5em; margin-bottom: 0.5em; display: block; } /* */
+        .article-full-content table { border-collapse: collapse; width: 100%; margin-bottom: 1.5em; border: 1px solid #ddd; } /* */
+        .article-full-content th, .article-full-content td { border: 1px solid #ddd; padding: 0.8em; text-align: left; } /* */
+        .article-full-content th { background-color: #f7f7f7; font-weight: 600; } /* */
+        .article-full-content hr { height: 0.25em; padding: 0; margin: 24px 0; background-color: #e1e4e8; border: 0; } /* */
+
+        .loading-message, .error-message { text-align: center; font-size: 1.2em; padding: 20px; color: #777; } /* */
+        .back-to-main { display: inline-block; margin-top: 30px; padding: 10px 18px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 0.95em; } /* */
+        .back-to-main:hover { background-color: #0056b3; } /* */
+
+        /* 评论区样式 */
+        .comments-section { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; } /* */
+        .comments-section h2 { font-size: 1.6em; margin-bottom: 20px; color: #333; } /* */
+        .comment-item { border-bottom: 1px dashed #eee; padding: 15px 0; } /* */
+        .comment-item:last-child { border-bottom: none; } /* */
+        .comment-author { font-weight: bold; color: #007bff; margin-right: 10px; } /* */
+        .comment-date { font-size: 0.85em; color: #888; } /* */
+        .comment-content { margin-top: 8px; line-height: 1.6; color: #555; white-space: pre-wrap; } /* */
+        .no-comments { color: #888; text-align: center; padding: 15px 0; } /* */
+
+        /* 评论表单样式 */
+        .comment-form-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; margin-bottom: 40px;} /* */
+        .comment-form-section h3 { font-size: 1.4em; margin-bottom: 15px; } /* */
+        .comment-form-section textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; margin-bottom: 10px; box-sizing: border-box; line-height: 1.6;} /* */
+        .comment-form-section button { padding: 8px 18px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; } /* */
+        .comment-form-section button:hover { background-color: #218838; } /* */
+        .login-prompt-comment { padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; text-align: center; color: #555; } /* */
+        .login-prompt-comment a { color: #007bff; font-weight: bold; } /* */
+
+        /* 点赞按钮样式 */
+        #likeButton {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            padding: 8px 15px; /* */
+            border-radius: 5px; /* */
+            cursor: pointer; /* */
+        }
+        #likeButton:hover {
+            background-color: #0056b3;
+        }
+        #likeButton.liked { /* 已点赞状态的样式 */
+            background-color: #28a745; /* 例如绿色 */
+            color: white;
+        }
+        #likeButton.liked:hover {
+            background-color: #218838;
+        }
+        .login-prompt-like { /* 如果需要登录提示 */
+            padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6; /* */
+            border-radius: 5px; text-align: center; color: #555; margin-top: 10px; /* */
+        }
+        .login-prompt-like a { color: #007bff; font-weight: bold; } /* */
+
+    </style>
+</head>
+<body>
+<nav class="main-nav" style="width:100%; position:fixed; top:0; left:0; z-index:1000; background: white; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+    <div class="nav-container" style="max-width: 1000px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+        <div class="nav-left" style="display: flex; align-items: center;">
+            <a class="logo" href="main.html" style="font-size: 22px; font-weight: bold; color: #007aff; text-decoration: none; margin-right: 20px;">掘金</a>
+            <div class="nav-menu">
+                <a href="main.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">首页</a>
+                <a href="publish.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">发布文章</a>
+                <a href="my_articles.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">我的文章</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="article-outer-container">
+    <div id="articleDetailContainer" class="article-container">
+        <p class="loading-message">正在加载文章内容...</p> </div>
+
+    <div id="commentsSection" class="comments-section article-container" style="margin-top: 20px; display: none;"> <h2>用户评论</h2> <div id="commentsListContainer">
+        <p class="loading-message">正在加载评论...</p> </div>
+    </div>
+
+    <div id="commentFormContainer" class="comment-form-section article-container" style="margin-top: 20px; margin-bottom: 40px; display: none;">  <h3>发表评论</h3> <div id="commentFormArea">
+        <textarea id="commentContent" placeholder="请在此输入您的评论内容... (支持换行)" rows="4"></textarea> <button onclick="submitComment()">提交评论</button> </div>
+    </div>
+</div>
+
+<script>
+    let currentArticleId = null; // 用于存储当前文章的ID //
+
+    function escapeHtml(unsafe) { //
+        if (unsafe === null || typeof unsafe === 'undefined') return ''; //
+        return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); //
+    }
+
+    document.addEventListener('DOMContentLoaded', function() { //
+        const articleDetailContainer = document.getElementById('articleDetailContainer'); //
+        const commentsSection = document.getElementById('commentsSection'); //
+        const commentFormContainer = document.getElementById('commentFormContainer'); //
+
+        const urlParams = new URLSearchParams(window.location.search); //
+        currentArticleId = urlParams.get('id'); //
+
+        if (currentArticleId) { //
+            loadArticleDetail(currentArticleId, articleDetailContainer, commentsSection, commentFormContainer); //
+            loadComments(currentArticleId); //
+            checkLoginStatusForCommentForm(); //
+        } else {
+            articleDetailContainer.innerHTML = '<p class="error-message">未指定文章ID。</p>'; //
+            commentsSection.style.display = 'none'; //
+            commentFormContainer.style.display = 'none'; //
+        }
+    });
+
+    function loadArticleDetail(articleId, container, commentsSection, commentFormContainer) { //
+        container.innerHTML = '<p class="loading-message">正在加载文章内容...</p>'; //
+        commentsSection.style.display = 'none'; // 加载文章时先隐藏评论和表单 //
+        commentFormContainer.style.display = 'none'; //
+
+        fetch(`GetArticleByIdServlet?id=${articleId}`) //
+            .then(response => {
+                if (!response.ok) { //
+                    return response.json().then(errData => { throw new Error((errData && errData.error) ? errData.error : `获取文章失败: ${response.status}`); }); //
+                }
+                return response.json(); //
+            })
+            .then(article => {
+                if (article && article.id) { //
+                    document.title = escapeHtml(article.title) + " - 文章详情"; //
+
+                    const markdownInput = article.fullContent || ""; //
+                    const articleHtmlContent = marked.parse(markdownInput); // 使用 marked.js //
+
+                    container.innerHTML = `
+                        <h1 class="article-full-title">${escapeHtml(article.title)}</h1>
+                        <div class="article-full-meta">
+                          <span>作者: ${article.authorIdentifier ? escapeHtml(article.authorIdentifier) : '匿名'}</span>
+                          <span>分类: ${article.category ? escapeHtml(article.category) : '无'}</span>
+                          <span>发布于: ${article.publishDate ? escapeHtml(article.publishDate) : '未知'}</span>
+                        </div>
+                        <div class="article-full-content">${articleHtmlContent}</div>
+
+                        <div class="like-section" style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+                            <button id="likeButton" onclick="handleLike()">点赞</button>
+                            <span id="likesCountDisplay" style="font-weight: bold;">${article.likesCount || 0}</span> <span>人点赞</span>
+                        </div>
+
+                        <a href="main.html" class="back-to-main">返回列表</a>
+                    `; //
+
+                    // 更新点赞按钮状态
+                    const likeButton = document.getElementById('likeButton'); //
+                    if (article.likedByCurrentUser) { //
+                        likeButton.textContent = '已点赞'; //
+                        likeButton.classList.add('liked'); //
+                    } else {
+                        likeButton.textContent = '点赞'; //
+                        likeButton.classList.remove('liked'); //
+                    }
+
+                    commentsSection.style.display = 'block'; // 文章加载成功后显示评论区 //
+                    commentFormContainer.style.display = 'block'; // 和评论表单 //
+                } else {
+                    container.innerHTML = `<p class="error-message">${(article && article.error) || '未能加载文章内容，文章可能不存在。'}</p>`; //
+                }
+            })
+            .catch(error => {
+                console.error('加载文章详情出错:', error); //
+                container.innerHTML = `<p class="error-message">加载文章失败：${escapeHtml(error.message)}</p>`; //
+            });
+    }
+
+    // 新增：处理点赞/取消点赞的函数
+    function handleLike() { //
+        if (!currentArticleId) { //
+            alert("无法确定文章ID。"); //
+            return; //
+        }
+
+        // 检查登录状态
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; //
+        if (!isLoggedIn) { //
+            const likeSection = document.querySelector('.like-section'); //
+            if (likeSection && !likeSection.querySelector('.login-prompt-like')) { //
+                const prompt = document.createElement('p'); //
+                prompt.className = 'login-prompt-like'; //
+                prompt.innerHTML = `请先 <a href="login.html?redirect=article.html?id=${currentArticleId}">登录</a> 后再点赞。`; //
+                likeSection.appendChild(prompt); //
+            } else if (!likeSection.querySelector('.login-prompt-like')) { //
+                alert(`请先登录后再点赞。`); // Fallback alert //
+            }
+            return; //
+        }
+
+
+        const formData = new URLSearchParams(); //
+        formData.append("articleId", currentArticleId); //
+
+        fetch('LikeArticleServlet', { //
+            method: 'POST', //
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, //
+            body: formData.toString() //
+        })
+            .then(response => { //
+                if (response.status === 401) { throw new Error('请先登录再操作。'); } //
+                if (!response.ok) { //
+                    return response.json().then(err => { throw new Error(err.error || err.message || `操作失败: ${response.status}`); }); //
+                }
+                return response.json(); //
+            })
+            .then(result => { //
+                if (result.success) { //
+                    const likeButton = document.getElementById('likeButton'); //
+                    const likesCountDisplay = document.getElementById('likesCountDisplay'); //
+
+                    likesCountDisplay.textContent = result.likesCount; //
+                    if (result.liked) { // 如果操作后是点赞状态 //
+                        likeButton.textContent = '已点赞'; //
+                        likeButton.classList.add('liked'); //
+                    } else { // 如果操作后是未点赞状态 //
+                        likeButton.textContent = '点赞'; //
+                        likeButton.classList.remove('liked'); //
+                    }
+                    const loginPrompt = document.querySelector('.login-prompt-like'); //
+                    if(loginPrompt) loginPrompt.remove(); //
+
+                } else {
+                    alert(result.message || "操作失败，请稍后再试。"); //
+                }
+            })
+            .catch(error => { //
+                console.error('点赞/取消点赞失败:', error); //
+                alert('操作失败：' + error.message); //
+            });
+    }
+
+
+    function loadComments(articleId) { //
+        const commentsContainer = document.getElementById('commentsListContainer'); //
+        commentsContainer.innerHTML = '<p class="loading-message">正在加载评论...</p>'; //
+
+        fetch(`GetCommentsServlet?articleId=${articleId}`) //
+            .then(response => {
+                if (!response.ok) { //
+                    return response.json().then(err => { throw new Error(err.error || `获取评论失败: ${response.status}`); }); //
+                }
+                return response.json(); //
+            })
+            .then(comments => {
+                if (comments && comments.length > 0) { //
+                    let commentsHtml = ''; //
+                    comments.forEach(comment => { //
+                        commentsHtml += `
+                <div class="comment-item" id="comment-${comment.id}">
+                  <span class="comment-author">${escapeHtml(comment.userNickname)}</span>
+                  <span class="comment-date">(${escapeHtml(comment.commentDate)})</span>
+                  <div class="comment-content">${escapeHtml(comment.content).replace(/\n/g, '<br>')}</div>
+                </div>
+              `; //
+                    });
+                    commentsContainer.innerHTML = commentsHtml; //
+                } else if (comments) { // 空数组 //
+                    commentsContainer.innerHTML = '<p class="no-comments">暂无评论，快来抢沙发吧！</p>'; //
+                } else {
+                    commentsContainer.innerHTML = '<p class="no-comments">加载评论列表时发生错误。</p>'; //
+                }
+            })
+            .catch(error => {
+                console.error('加载评论失败:', error); //
+                commentsContainer.innerHTML = `<p class="no-comments">加载评论失败：${escapeHtml(error.message)}</p>`; //
+            });
+    }
+
+    function submitComment() { //
+        if (!currentArticleId) { //
+            alert("无法确定文章ID，无法发表评论。"); //
+            return; //
+        }
+        const commentContentInput = document.getElementById('commentContent'); //
+        const content = commentContentInput.value.trim(); //
+
+        if (!content) { //
+            alert("评论内容不能为空！"); //
+            commentContentInput.focus(); //
+            return; //
+        }
+
+        const formData = new URLSearchParams(); //
+        formData.append("articleId", currentArticleId); //
+        formData.append("commentContent", content); //
+
+        fetch('AddCommentServlet', { //
+            method: 'POST', //
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, //
+            body: formData.toString() //
+        })
+            .then(response => {
+                if (response.status === 401) { throw new Error('请先登录再发表评论。'); } //
+                if (!response.ok) { //
+                    return response.json().then(err => { throw new Error(err.error || err.message || `发表评论失败: ${response.status}`); }); //
+                }
+                return response.json(); //
+            })
+            .then(result => {
+                if (result.success && result.comment) { //
+                    commentContentInput.value = ''; //
+                    const commentsContainer = document.getElementById('commentsListContainer'); //
+                    const newCommentHtml = `
+            <div class="comment-item" id="comment-${result.comment.id}">
+              <span class="comment-author">${escapeHtml(result.comment.userNickname)}</span>
+              <span class="comment-date">(${escapeHtml(result.comment.commentDate)})</span>
+              <div class="comment-content">${escapeHtml(result.comment.content).replace(/\n/g, '<br>')}</div>
+            </div>
+          `; //
+                    const noCommentsP = commentsContainer.querySelector('.no-comments'); //
+                    if (noCommentsP) { //
+                        commentsContainer.innerHTML = newCommentHtml; //
+                    } else {
+                        commentsContainer.insertAdjacentHTML('afterbegin', newCommentHtml); //
+                    }
+
+                } else if (result.success) { // 成功但没有返回评论对象 //
+                    commentContentInput.value = ''; //
+                    loadComments(currentArticleId); // 重新加载列表作为备选 //
+                } else {
+                    alert(result.message || "评论发表失败，请稍后再试。"); //
+                }
+            })
+            .catch(error => {
+                console.error('发表评论失败:', error); //
+                alert('发表评论失败：' + error.message); //
+            });
+    }
+
+    function checkLoginStatusForCommentForm() { //
+        console.log("localStorage isLoggedIn:", localStorage.getItem('isLoggedIn')); // 添加日志输出 //
+        const commentFormArea = document.getElementById('commentFormArea'); //
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; //
+
+        if (!isLoggedIn && commentFormArea) { // 确保 commentFormArea 存在 //
+            commentFormArea.innerHTML = `<p class="login-prompt-comment">请先 <a href="login.html?redirect=article.html?id=${currentArticleId}">登录</a> 后再发表评论。</p>`; //
+        }
+    }
+
+</script>
+</body>
+</html>

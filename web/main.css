@@ -1,0 +1,206 @@
+body {
+    margin: 0;
+    font-family: 'Helvetica', sans-serif;
+    background-color: #f9f9f9;
+}
+
+.main-nav {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    padding: 10px 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #007aff;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+.nav-menu a {
+    margin: 0 10px;
+    color: #333;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.nav-menu a.active,
+.nav-menu a:hover {
+    background-color: #007aff;
+    color: white;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    margin-right: 16px;
+}
+
+.search-box input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background: #f3f3f3;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.user-area .vip-link,
+.user-area .login-btn,
+.user-area .register-btn {
+    margin-left: 10px;
+    color: #007aff;
+    background: none;
+    border: none;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.content-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 20px auto;
+    gap: 20px;
+}
+
+.left-sidebar {
+    width: 180px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.category-nav a {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.category-nav a.active,
+.category-nav a:hover {
+    background-color: #007aff;
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 300px;
+}
+
+.sidebar {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar section {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.sign-btn,
+.refresh-btn {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.more-link {
+    display: block;
+    text-align: right;
+    margin-top: 10px;
+    color: #007aff;
+    text-decoration: none;
+}
+
+.rank-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.rank-list li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 文章样式 */
+.article {
+    border-bottom: 1px solid #ddd;
+    padding: 20px 0;
+}
+
+.article-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.article-title a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.article-title a:hover {
+    text-decoration: underline;
+}
+
+.article-meta {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.article-summary {
+    font-size: 1em;
+    color: #333;
+}
+
+.read-more {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}

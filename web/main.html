@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>稀土掘金</title>
+  <link rel="stylesheet" href="main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* 为 Markdown 摘要预览添加样式 (保持这部分不变) */
+    .article-summary-markdown-preview {
+      max-height: 3.6em;
+      overflow: hidden;
+      position: relative;
+      line-height: 1.8em;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .article-summary-markdown-preview::after {
+      content: "...";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      padding-left: 25px;
+      background: linear-gradient(to right, transparent, white 70%, white);
+      font-weight: bold;
+      color: #555;
+    }
+    .article-summary-markdown-preview p {
+      margin-top: 0;
+      margin-bottom: 0.3em;
+    }
+    .article-summary-markdown-preview h1,
+    .article-summary-markdown-preview h2,
+    .article-summary-markdown-preview h3,
+    .article-summary-markdown-preview h4,
+    .article-summary-markdown-preview h5,
+    .article-summary-markdown-preview h6 {
+      font-size: 1.05em;
+      margin-top: 0;
+      margin-bottom: 0.2em;
+      line-height: 1.4em;
+    }
+    .article-summary-markdown-preview ul,
+    .article-summary-markdown-preview ol,
+    .article-summary-markdown-preview blockquote,
+    .article-summary-markdown-preview pre {
+      margin: 0.2em 0;
+      font-size: 0.9em;
+      padding: 0;
+    }
+    .article-summary-markdown-preview ul,
+    .article-summary-markdown-preview ol {
+      margin-left: 1.5em;
+    }
+    .article-summary-markdown-preview pre {
+      background-color: #f0f0f0;
+      padding: 2px 4px;
+    }
+    .article-summary-markdown-preview code {
+      font-size: 0.9em;
+      background-color: #f0f0f0;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .article-summary-markdown-preview pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    .article-summary-markdown-preview img {
+      display: none;
+    }
+    /* --- 结束 Markdown 摘要预览样式 --- */
+
+    .article-meta .article-likes {
+    }
+    .rank-list li {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 8px 0;
+    }
+    .rank-list li a {
+      text-decoration: none;
+      color: #337ab7;
+    }
+    .rank-list li a:hover {
+      text-decoration: underline;
+      color: #23527c;
+    }
+    .rank-list li strong {
+      margin-right: 8px;
+      color: #e47417;
+      min-width: 20px;
+      display: inline-block;
+    }
+    .rank-list li .like-count-badge {
+      float: right;
+      color: #777;
+      font-size: 0.9em;
+      background-color: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+    .rank-list li .author-name-rank {
+      color: #333;
+    }
+    .user-area .nav-avatar { /* 导航栏头像样式 */
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 8px;
+      object-fit: cover;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<nav class="main-nav">
+  <div class="nav-container">
+    <div class="nav-left">
+      <a class="logo" href="main.html">掘金</a>
+      <div class="nav-menu">
+        <a href="main.html" class="active" data-category-type="top" data-category-name="首页">首页</a>
+        <a href="#" data-category-type="top" data-category-name="AI Coding">AI Coding</a>
+        <a href="publish.html">发布文章</a>
+        <a href="my_articles.html">我的文章</a>
+        <a href="profile.html" id="navProfileLink" style="display:none;">个人资料</a>
+        <a href="#" data-category-type="top" data-category-name="APP">APP</a>
+        <a href="#" data-category-type="top" data-category-name="插件">插件</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="search-box">
+        <input type="text" placeholder="搜索文章标题或内容" />
+        <button class="search-btn">🔍</button>
+      </div>
+      <div class="user-area" style="display: flex; align-items: center;">
+        <img id="navUserAvatar" src="default-avatar.png" alt="avatar" class="nav-avatar" style="display:none;">
+        <a href="#" id="navUserNickname" class="vip-link" style="text-decoration:none; color:#007aff;">欢迎登录！！！</a>
+        <button id="logoutButton" style="display:none; margin-left: 10px; padding: 5px 10px; cursor:pointer;">登出</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="content-container">
+  <aside class="left-sidebar">
+    <nav class="category-nav">
+      <a href="#" class="active" data-category-type="side" data-category-name="综合">综合</a>
+      <a href="#" data-category-type="side" data-category-name="后端">后端</a>
+      <a href="#" data-category-type="side" data-category-name="前端">前端</a>
+      <a href="#" data-category-type="side" data-category-name="Android">Android</a>
+      <a href="#" data-category-type="side" data-category-name="iOS">iOS</a>
+      <a href="#" data-category-type="side" data-category-name="人工智能">人工智能</a>
+      <a href="#" data-category-type="side" data-category-name="开发工具">开发工具</a>
+      <a href="#" data-category-type="side" data-category-name="代码人生">代码人生</a>
+      <a href="#" data-category-type="side" data-category-name="阅读">阅读</a>
+      <a href="#" data-category-type="side" data-category-name="史程昊作品">220162401030史程昊</a>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="main-content">
+    <p style="text-align:center; padding: 20px; color: #777;">正在加载内容...</p>
+  </div>
+
+  <aside class="sidebar">
+    <section class="user-status">
+      <h3>你好！</h3>
+      <button class="sign-btn">去签到</button>
+      <p class="subtitle">点亮在社区的每一天</p>
+    </section>
+    <section class="authors">
+      <h3>作者榜</h3>
+      <ul class="rank-list" id="author-rank-list">
+        <li>正在加载作者榜...</li>
+      </ul>
+    </section>
+    <section class="ranking" id="hot-articles-section">
+      <h3>热门文章榜</h3>
+      <ul class="rank-list" id="hot-article-rank-list">
+        <li>正在加载热门文章...</li>
+      </ul>
+    </section>
+  </aside>
+</main>
+
+<script>
+  //const appBaseUrl = "http://localhost:8080/javaweb_Web_exploded";
+  const contentArea = document.getElementById('main-content');
+  const navLinks = document.querySelectorAll('.category-nav a');
+  const topLinks = document.querySelectorAll('.nav-menu a');
+  const staticTopContentMap = {
+    "AI Coding": `<h2>AI Coding</h2><p>探索AI辅助编程的最新工具和实践。</p><p>这里的内容是静态定义的。</p>`,
+    "APP": `<h2>APP下载</h2><p>扫描二维码下载我们的APP。</p>`,
+    "插件": `<h2>浏览器插件</h2><p>安装掘金浏览器插件，提升阅读体验。</p>`
+  };
+
+  function escapeHtml(unsafe) {
+    if (unsafe === null || typeof unsafe === 'undefined') return '';
+    return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  function displayArticles(articles, displayArea, titlePrefix = "文章列表") {
+    if (!Array.isArray(articles)) {
+      console.error("displayArticles: 传入的 articles 不是一个数组", articles);
+      displayArea.innerHTML = `<p class="error-message">加载文章时发生错误，数据格式不正确。</p>`;
+      return;
+    }
+    if (articles.length > 0) {
+      let articlesHtml = `<h2 style="margin-bottom: 20px;">${escapeHtml(titlePrefix)}</h2>`;
+      articles.forEach(article => {
+        const markdownSnippet = article.contentSnippet || "";
+        const renderedHtmlSnippet = marked.parse(markdownSnippet);
+
+        let authorAvatarHtml = '';
+        if (article.authorAvatarUrl) {
+          // 使用相对路径，浏览器会自动处理
+          authorAvatarHtml = `<img src="${article.authorAvatarUrl}" alt="author" style="width:20px; height:20px; border-radius:50%; vertical-align:middle; margin-right:5px;">`;
+        }
+        // 移除了 authorAvatarHtml 的定义和使用
+        // let authorAvatarHtml = `<img src="default-avatar.png" alt="author" style="width:20px; height:20px; border-radius:50%; vertical-align:middle; margin-right:5px;">`;
+        // if (article.authorAvatarUrl && article.authorAvatarUrl !== 'default-avatar.png') {
+        //   authorAvatarHtml = `<img src="${appBaseUrl}/${article.authorAvatarUrl}" alt="author" style="width:20px; height:20px; border-radius:50%; vertical-align:middle; margin-right:5px;">`;
+        // }
+
+        articlesHtml += `
+          <div class="article">
+            <h3 class="article-title"><a href="article.html?id=${article.id}">${escapeHtml(article.title)}</a></h3>
+            <p class="article-meta">
+              作者: ${article.authorIdentifier ? escapeHtml(article.authorIdentifier) : '匿名'} |
+              分类: ${article.category ? escapeHtml(article.category) : '无'} |
+              发布于: ${article.publishDate ? escapeHtml(article.publishDate) : '未知'} |
+              <span class="article-likes">赞: ${article.likesCount !== undefined ? article.likesCount : 0}</span>
+            </p>
+            <div class="article-summary-markdown-preview">
+              ${renderedHtmlSnippet}
+            </div>
+            <a href="article.html?id=${article.id}" class="read-more" data-article-id="${article.id}">阅读更多</a>
+          </div>
+        `;
+      });
+      displayArea.innerHTML = articlesHtml;
+    } else {
+      displayArea.innerHTML = `<p style="text-align:center; padding: 20px; color: #777;">该分类下暂无文章，或未找到相关文章。</p>`;
+    }
+  }
+
+  function fetchAndDisplayArticles(categoryName, displayArea, titlePrefix) {
+    displayArea.innerHTML = '<p style="text-align:center; padding: 20px; color: #777;">正在加载文章...</p>';
+    fetch(`GetArticlesByCategoryServlet?category=${encodeURIComponent(categoryName)}`)
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(errData => {
+                  throw new Error((errData && errData.error) ? errData.error : `请求失败，状态码：${response.status}`);
+                }).catch(() => {
+                  throw new Error(`请求文章列表失败，服务器返回状态：${response.status}`);
+                });
+              }
+              return response.json();
+            })
+            .then(articles => {
+              if (articles && articles.error) {
+                displayArea.innerHTML = `<p class="error-message">加载文章错误: ${escapeHtml(articles.error)}</p>`;
+              } else {
+                // 确保 ArticleDTO 仍然传递了 authorAvatarUrl，即使这里不用，其他地方可能用
+                displayArticles(articles, displayArea, titlePrefix || `分类: ${categoryName}`);
+              }
+            })
+            .catch(error => {
+              console.error(`加载文章失败 (${categoryName}):`, error);
+              displayArea.innerHTML = `<p class="error-message">加载文章失败: ${escapeHtml(error.message)}</p>`;
+            });
+  }
+
+  // --- (navLinks, topLinks, logoLink, search 相关事件监听器代码保持不变) ---
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const categoryName = link.dataset.categoryName;
+      if (!categoryName) return;
+      navLinks.forEach(l => l.classList.remove('active'));
+      topLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      fetchAndDisplayArticles(categoryName, contentArea, categoryName);
+    });
+  });
+
+  topLinks.forEach(link => {
+    const hrefValue = link.getAttribute('href');
+    const categoryName = link.dataset.categoryName;
+    link.addEventListener('click', function(e) {
+      if (hrefValue && hrefValue !== '#' && hrefValue !== 'javascript:void(0);' &&
+              (hrefValue !== 'main.html' || categoryName !== '首页') ) {
+        if(hrefValue === 'profile.html' || hrefValue === 'publish.html' || hrefValue === 'my_articles.html'){
+          return;
+        }
+      }
+      e.preventDefault();
+      topLinks.forEach(l => l.classList.remove('active'));
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      if ( (hrefValue === 'main.html' && categoryName === "首页") || categoryName === "首页") {
+        fetchAndDisplayArticles("综合", contentArea, "最新推荐");
+      } else if (staticTopContentMap[categoryName]) {
+        contentArea.innerHTML = staticTopContentMap[categoryName];
+      } else if (categoryName) {
+        fetchAndDisplayArticles(categoryName, contentArea, categoryName);
+      } else {
+        contentArea.innerHTML = '<p style="text-align:center; padding: 20px; color: #777;">暂无内容。</p>';
+      }
+    });
+  });
+
+  const logoLink = document.querySelector('a.logo');
+  if (logoLink) {
+    logoLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      topLinks.forEach(l => l.classList.remove('active'));
+      navLinks.forEach(l => l.classList.remove('active'));
+      const homeTopLink = Array.from(topLinks).find(tl => tl.dataset.categoryName === "首页" );
+      if(homeTopLink) homeTopLink.classList.add('active');
+      const homeSideLink = Array.from(navLinks).find(sl => sl.dataset.categoryName === "综合" );
+      if(homeSideLink) homeSideLink.classList.add('active');
+      fetchAndDisplayArticles("综合", contentArea, "最新推荐");
+    });
+  }
+
+  const searchInput = document.querySelector('.search-box input[type="text"]');
+  const searchButton = document.querySelector('.search-box .search-btn');
+  function performSearch() {
+    const query = searchInput.value.trim();
+    if (!query) {
+      fetchAndDisplayArticles("综合", contentArea, "最新推荐");
+      return;
+    }
+    navLinks.forEach(l => l.classList.remove('active'));
+    topLinks.forEach(l => l.classList.remove('active'));
+    contentArea.innerHTML = '<p style="text-align:center; padding: 20px; color: #777;">正在搜索中...</p>';
+    fetch(`SearchArticleServlet?query=${encodeURIComponent(query)}`)
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(errData => {
+                  throw new Error((errData && errData.error) ? errData.error : `搜索请求失败: ${response.status}`);
+                }).catch(() => { throw new Error(`搜索请求失败: ${response.status}`); });
+              }
+              return response.json();
+            })
+            .then(articles => {
+              if (articles && articles.error) {
+                contentArea.innerHTML = `<p class="error-message">搜索错误: ${escapeHtml(articles.error)}</p>`;
+              } else {
+                displayArticles(articles, contentArea, `搜索结果: "${escapeHtml(query)}"`);
+              }
+            })
+            .catch(error => {
+              console.error("搜索请求处理失败:", error);
+              contentArea.innerHTML = `<p class="error-message">搜索时发生错误: ${escapeHtml(error.message)}</p>`;
+            });
+  }
+  if (searchButton) { searchButton.addEventListener('click', performSearch); }
+  if (searchInput) { searchInput.addEventListener('keypress', function(event) { if (event.key === 'Enter') { event.preventDefault(); performSearch(); } }); }
+
+
+  function loadHotArticlesRanking() {
+    const rankListUl = document.getElementById('hot-article-rank-list');
+    if (!rankListUl) { return; }
+    rankListUl.innerHTML = '<li>正在加载热门文章...</li>';
+    fetch(`GetRankedArticlesServlet`)
+            .then(response => response.ok ? response.json() : response.json().then(err => { throw err; }))
+            .then(articles => {
+              if (articles && articles.length > 0) {
+                let rankHtml = '';
+                articles.forEach((article, index) => {
+                  const title = article.title || "无标题";
+                  const shortTitle = title.length > 18 ? title.substring(0, 18) + '...' : title;
+                  rankHtml += `<li><strong>${index + 1}.</strong> <a href="article.html?id=${article.id}" title="${escapeHtml(title)}">${escapeHtml(shortTitle)}</a><span class="like-count-badge">${article.likesCount !== undefined ? article.likesCount : 0}赞</span></li>`;
+                });
+                rankListUl.innerHTML = rankHtml;
+              } else { rankListUl.innerHTML = '<li>暂无热门文章。</li>';}
+            }).catch(error => {
+      console.error("加载热门文章榜失败:", error);
+      rankListUl.innerHTML = `<li>加载热门文章榜失败。</li>`;
+    });
+  }
+
+  function loadAuthorRanking() {
+    const rankListUl = document.getElementById('author-rank-list');
+    if (!rankListUl) { return; }
+    rankListUl.innerHTML = '<li>正在加载作者榜...</li>';
+    fetch(`GetRankedAuthorsServlet`)
+            .then(response => response.ok ? response.json() : response.json().then(err => { throw err; }))
+            .then(authors => {
+              if (authors && authors.length > 0) {
+                let rankHtml = '';
+                authors.forEach((author, index) => {
+                  const authorName = author.authorIdentifier || "匿名作者";
+                  const shortAuthorName = authorName.length > 12 ? authorName.substring(0, 10) + '...' : authorName;
+                  rankHtml += `<li><strong>${index + 1}.</strong> <span class="author-name-rank" title="${escapeHtml(authorName)}">${escapeHtml(shortAuthorName)}</span><span class="like-count-badge">${author.totalLikes !== undefined ? author.totalLikes : 0} 总赞</span></li>`;
+                });
+                rankListUl.innerHTML = rankHtml;
+              } else { rankListUl.innerHTML = '<li>暂无作者数据。</li>'; }
+            }).catch(error => {
+      console.error("加载作者榜失败:", error);
+      rankListUl.innerHTML = `<li>加载作者榜失败。</li>`;
+    });
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userNickname');
+    localStorage.removeItem('userAvatarUrl');
+    alert("您已成功登出！");
+    window.location.href = "login.html";
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const userNickname = localStorage.getItem('userNickname');
+    const userAvatarUrl = localStorage.getItem('userAvatarUrl');
+    const navUserNickname = document.getElementById('navUserNickname');
+    const navProfileLink = document.getElementById('navProfileLink');
+    const navUserAvatar = document.getElementById('navUserAvatar');
+    const logoutButton = document.getElementById('logoutButton');
+
+    if (userNickname && navUserNickname) {
+      navUserNickname.textContent = `欢迎，${escapeHtml(userNickname)}！`;
+      navUserNickname.href = "profile.html"; // 登录后可以点击跳转到个人资料页
+      if (navProfileLink) navProfileLink.style.display = 'inline-block';
+      if (logoutButton) logoutButton.style.display = 'inline-block';
+
+      if (navUserAvatar) {
+        // **【修改部分】**
+        // 直接使用 localStorage 中的相对路径
+        // 浏览器会自动解析相对于当前页面的路径
+        if (userAvatarUrl && userAvatarUrl !== 'default-avatar.png') {
+          navUserAvatar.src = userAvatarUrl;
+        } else {
+          navUserAvatar.src = 'default-avatar.png';
+        }
+        navUserAvatar.style.display = 'inline-block';
+      }
+    } else if (navUserNickname) {
+      navUserNickname.innerHTML = '<a href="login.html" style="text-decoration:none; color:#007aff;">登录/注册</a>';
+      if (navProfileLink) navProfileLink.style.display = 'none';
+      if (navUserAvatar) navUserAvatar.style.display = 'none';
+      if (logoutButton) logoutButton.style.display = 'none';
+    }
+
+    if(logoutButton){
+      logoutButton.addEventListener('click', handleLogout);
+    }
+
+    // --- 页面加载逻辑保持不变 ---
+    if (window.location.pathname.includes('main.html')) {
+      const activeTopLink = document.querySelector('.nav-menu a.active');
+      const activeSideLink = document.querySelector('.category-nav a.active');
+      if (activeTopLink && activeTopLink.dataset.categoryName === "首页") {
+        fetchAndDisplayArticles("综合", contentArea, "最新推荐");
+      } else if (activeSideLink && activeSideLink.dataset.categoryName) {
+        fetchAndDisplayArticles(activeSideLink.dataset.categoryName, contentArea, activeSideLink.dataset.categoryName);
+      } else {
+        fetchAndDisplayArticles("综合", contentArea, "最新推荐");
+      }
+      loadHotArticlesRanking();
+      loadAuthorRanking();
+    }
+  });
+</script>
+</body>
+</html>

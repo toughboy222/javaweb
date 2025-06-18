@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布新文章 (左右预览) - 220162401030 史程昊</title>
+    <link rel="stylesheet" href="main.css"> <style>
+    body {
+        font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding-top: 60px; /* 为固定导航栏预留空间 */
+    }
+    .publish-outer-container {
+        padding: 20px 15px; /* 页面整体内边距 */
+    }
+    .publish-container {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 1200px; /* 适当加宽以容纳左右布局 */
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .publish-title {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #555;
+    }
+    .form-group input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    /* 编辑器和预览的左右布局 */
+    .editor-preview-wrapper {
+        display: flex;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        min-height: 500px; /* 设定一个最小高度 */
+        max-height: 70vh; /* 最大高度，超出部分可滚动 */
+        margin-bottom: 20px;
+    }
+    .editor-pane, .preview-pane {
+        flex: 1; /* 各占一半宽度 */
+        padding: 15px;
+        overflow-y: auto; /* 内容超出时垂直滚动 */
+    }
+    .editor-pane {
+        border-right: 1px solid #ddd; /* 中间分割线 */
+    }
+    .editor-pane textarea {
+        width: 100%;
+        height: 100%; /* 占满父容器高度 */
+        border: none; /* 移除 textarea 默认边框，因为父容器已有边框 */
+        outline: none; /* 移除焦点时的轮廓 */
+        resize: none; /* 禁止调整大小，因为高度由父容器控制 */
+        font-size: 16px;
+        line-height: 1.7;
+        font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        box-sizing: border-box;
+    }
+    .preview-pane h3 { /* 预览区内的 "内容预览：" 标题 */
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        color: #666;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+    #markdownPreview {
+        /* 复用 article.html 中 .article-full-content 的样式 */
+        font-size: 1.05em;
+        line-height: 1.8;
+        color: #444;
+    }
+    /* 这里可以粘贴 article.html 中为 #markdownPreview (原 .article-full-content) 定义的详细 Markdown 元素样式 */
+    #markdownPreview h1, #markdownPreview h2, #markdownPreview h3, #markdownPreview h4, #markdownPreview h5, #markdownPreview h6 { margin-top: 1.5em; margin-bottom: 0.6em; line-height: 1.25; font-weight: 600; }
+    #markdownPreview h1 { font-size: 1.8em; }
+    #markdownPreview h2 { font-size: 1.5em; }
+    #markdownPreview h3 { font-size: 1.3em; } /* 预览区内的H3 */
+    #markdownPreview h4 { font-size: 1.15em; }
+    #markdownPreview p { margin-bottom: 1em; }
+    #markdownPreview ul, #markdownPreview ol { margin-left: 1.5em; margin-bottom: 1em; padding-left: 0; }
+    #markdownPreview li { margin-bottom: 0.3em; }
+    #markdownPreview blockquote { margin: 1.2em 0; padding: 0.6em 1em; border-left: 4px solid #007bff; background-color: #f8f9fa; color: #555; }
+    #markdownPreview blockquote p:last-child { margin-bottom: 0; }
+    #markdownPreview pre { background-color: #2d2d2d; color: #f8f8f2; padding: 0.8em; border-radius: 4px; overflow-x: auto; margin-bottom: 1.2em; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.9em; }
+    #markdownPreview code { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; background-color: rgba(27,31,35,.05); padding: .2em .4em; margin: 0; font-size: 85%; border-radius: 3px; }
+    #markdownPreview pre code { background-color: transparent; padding: 0; margin: 0; font-size: inherit; border-radius: 0; color: inherit; }
+    #markdownPreview img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 0.5em; margin-bottom: 0.5em; display: block; }
+    #markdownPreview table { border-collapse: collapse; width: 100%; margin-bottom: 1.2em; border: 1px solid #ddd; }
+    #markdownPreview th, #markdownPreview td { border: 1px solid #ddd; padding: 0.6em; text-align: left; }
+    #markdownPreview th { background-color: #f7f7f7; font-weight: 600; }
+    #markdownPreview hr { height: 0.2em; padding: 0; margin: 20px 0; background-color: #e1e4e8; border: 0; }
+
+
+    .publish-actions { /* 包裹按钮和链接 */
+        display: flex;
+        align-items: center;
+    }
+    .publish-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    .publish-btn:hover {
+        background-color: #0056b3;
+    }
+    .back-link {
+        margin-left: 20px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.95em;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<nav class="main-nav" style="width:100%; position:fixed; top:0; left:0; z-index:1000; background: white; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+    <div class="nav-container" style="max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+        <div class="nav-left" style="display: flex; align-items: center;">
+            <a class="logo" href="main.html" style="font-size: 22px; font-weight: bold; color: #007aff; text-decoration: none; margin-right: 20px;">掘金</a>
+            <div class="nav-menu">
+                <a href="main.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">首页</a>
+                <a href="publish.html" class="active" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px; background-color: #e6f0ff;">发布文章</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="publish-outer-container">
+    <div class="publish-container">
+        <h1 class="publish-title">撰写新文章</h1>
+        <form id="publishForm">
+            <div class="form-group">
+                <label for="title">文章标题：</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">分类 (可选)：</label>
+                <input type="text" id="category" name="category" placeholder="例如：前端, 后端, 生活">
+            </div>
+
+            <div class="form-group">
+                <label for="articleMarkdownContent">文章内容 (Markdown)：</label>
+                <div class="editor-preview-wrapper">
+                    <div class="editor-pane">
+                        <textarea id="articleMarkdownContent" name="content" required placeholder="在此输入 Markdown 内容..."></textarea>
+                    </div>
+                    <div class="preview-pane">
+                        <h3>内容预览：</h3>
+                        <div id="markdownPreview">
+                            <p style="color: #888; text-align: center; margin-top: 20px;">预览将在此显示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="publish-actions">
+                <button type="button" class="publish-btn" onclick="submitArticle()">发布文章</button>
+                <a href="main.html" class="back-link">返回首页</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function escapeHtml(unsafe) {
+        if (unsafe === null || typeof unsafe === 'undefined') return '';
+        return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    const contentTextarea = document.getElementById('articleMarkdownContent');
+    const previewArea = document.getElementById('markdownPreview');
+
+    if (contentTextarea && previewArea) {
+        function updatePreview() {
+            const markdownText = contentTextarea.value;
+            previewArea.innerHTML = marked.parse(markdownText);
+        }
+        contentTextarea.addEventListener('input', updatePreview);
+        if (contentTextarea.value) { // 初始化时如果 textarea 有内容 (例如浏览器回填)
+            updatePreview();
+        }
+    }
+
+    function submitArticle() {
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('articleMarkdownContent').value;
+        const category = document.getElementById('category').value.trim();
+
+        if (!title) {
+            alert("文章标题不能为空！");
+            document.getElementById('title').focus();
+            return;
+        }
+        if (!content.trim()) {
+            alert("文章内容不能为空！");
+            document.getElementById('articleMarkdownContent').focus();
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("category", category);
+
+        fetch("PublishArticleServlet", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errData => {
+                        throw new Error((errData && errData.error) ? errData.error : `发布失败: ${response.status}`);
+                    }).catch(() => { throw new Error(`发布请求失败: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert(result.message || "操作完成");
+                if (result.success) {
+                    document.getElementById('publishForm').reset();
+                    if (previewArea) previewArea.innerHTML = '<p style="color: #888; text-align: center; margin-top: 20px;">预览将在此显示</p>';
+                }
+            })
+            .catch(error => {
+                console.error("发布文章失败：", error);
+                alert("发布文章失败：" + error.message);
+            });
+    }
+</script>
+</body>
+</html>

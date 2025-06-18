@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改文章 - 掘金</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        /* 复用 publish.html 的样式，这里可以根据需要微调 */
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding-top: 60px;
+        }
+        .publish-outer-container {
+            padding: 20px 15px;
+        }
+        .publish-container { /* 可以沿用 publish.html 的容器样式 */
+            background: white;
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .publish-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+        .form-group input[type="text"], .form-group textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box;
+        }
+        .editor-preview-wrapper { /* 左右预览的样式 */
+            display: flex; border: 1px solid #ddd; border-radius: 6px;
+            min-height: 400px; max-height: 60vh; margin-bottom: 20px;
+        }
+        .editor-pane, .preview-pane {
+            flex: 1; padding: 15px; overflow-y: auto;
+        }
+        .editor-pane { border-right: 1px solid #ddd; }
+        .editor-pane textarea {
+            width: 100%; height: 100%; border: none; outline: none;
+            resize: none; font-size: 16px; line-height: 1.7;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+        .preview-pane h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: #666; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        #markdownPreview { /* 预览区 Markdown 样式，可以从 publish.html 复制 */
+            font-size: 1.05em; line-height: 1.8; color: #444;
+        }
+        /* ... (从 publish.html 复制 #markdownPreview 的详细子元素样式) ... */
+        #markdownPreview p { margin-bottom: 1em; }
+
+
+        .publish-actions { display: flex; align-items: center; }
+        .publish-btn { /* 可以叫 update-btn */
+            background-color: #28a745; /* 更新按钮用绿色 */
+            color: white; padding: 10px 18px; border: none;
+            border-radius: 6px; cursor: pointer; font-size: 16px;
+        }
+        .publish-btn:hover { background-color: #218838; }
+        .back-link { margin-left: 20px; color: #007bff; text-decoration: none; font-size: 0.95em;}
+        .back-link:hover { text-decoration: underline; }
+        .loading-message, .error-message { text-align: center; padding: 20px; color: #777; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<nav class="main-nav" style="width:100%; position:fixed; top:0; left:0; z-index:1000; background: white; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+    <div class="nav-container" style="max-width: 1000px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+        <div class="nav-left" style="display: flex; align-items: center;">
+            <a class="logo" href="main.html" style="font-size: 22px; font-weight: bold; color: #007aff; text-decoration: none; margin-right: 20px;">掘金</a>
+            <div class="nav-menu">
+                <a href="main.html" style="margin: 0 10px; color: #333; text-decoration: none;">首页</a>
+                <a href="publish.html" style="margin: 0 10px; color: #333; text-decoration: none;">发布文章</a>
+                <a href="my_articles.html" style="margin: 0 10px; color: #333; text-decoration: none;">我的文章</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="publish-outer-container">
+    <div class="publish-container" id="editArticleContainer">
+        <h1 class="publish-title">修改文章</h1>
+        <form id="editForm">
+            <input type="hidden" id="articleId" name="articleId"> <div class="form-group">
+            <label for="title">文章标题：</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+            <div class="form-group">
+                <label for="category">分类 (可选)：</label>
+                <input type="text" id="category" name="category" placeholder="例如：前端, 后端, 生活">
+            </div>
+
+            <div class="form-group">
+                <label for="articleMarkdownContent">文章内容 (Markdown)：</label>
+                <div class="editor-preview-wrapper">
+                    <div class="editor-pane">
+                        <textarea id="articleMarkdownContent" name="content" required placeholder="在此输入 Markdown 内容..."></textarea>
+                    </div>
+                    <div class="preview-pane">
+                        <h3>内容预览：</h3>
+                        <div id="markdownPreview">
+                            <p style="color: #888; text-align: center; margin-top: 20px;">预览将在此显示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="publish-actions">
+                <button type="button" class="publish-btn" onclick="submitUpdate()">更新文章</button>
+                <a href="my_articles.html" class="back-link">返回我的文章</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const articleIdInput = document.getElementById('articleId');
+    const titleInput = document.getElementById('title');
+    const categoryInput = document.getElementById('category');
+    const contentTextarea = document.getElementById('articleMarkdownContent');
+    const previewArea = document.getElementById('markdownPreview');
+    const editArticleContainer = document.getElementById('editArticleContainer');
+
+    function escapeHtml(unsafe) { /* ... (与之前相同的 escapeHtml 函数) ... */ return unsafe === null || typeof unsafe === 'undefined' ? '' : unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");}
+
+    // Markdown 实时预览逻辑
+    if (contentTextarea && previewArea) {
+        function updatePreview() {
+            previewArea.innerHTML = marked.parse(contentTextarea.value);
+        }
+        contentTextarea.addEventListener('input', updatePreview);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id');
+
+        if (!articleId) {
+            editArticleContainer.innerHTML = '<p class="error-message">错误：未提供文章ID。无法编辑。</p>';
+            return;
+        }
+
+        articleIdInput.value = articleId; // 设置隐藏字段的值
+
+        // 获取现有文章数据并填充表单
+        fetch(`GetArticleByIdServlet?id=${articleId}`)
+            .then(response => {
+                if (response.status === 401) {
+                    editArticleContainer.innerHTML = '<p class="error-message">您需要先<a href="login.html">登录</a>才能修改文章。</p>';
+                    throw new Error('User not logged in or session expired for edit.');
+                }
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || `获取文章数据失败: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(article => {
+                if (article && article.id) {
+                    titleInput.value = article.title || '';
+                    categoryInput.value = article.category || '';
+                    contentTextarea.value = article.fullContent || ''; // 使用 fullContent 填充 textarea
+                    updatePreview(); // 更新预览
+                } else {
+                    editArticleContainer.innerHTML = `<p class="error-message">${article.error || '无法加载文章数据进行编辑。'}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('加载文章编辑数据失败:', error);
+                if (error.message !== 'User not logged in or session expired for edit.') {
+                    editArticleContainer.innerHTML = `<p class="error-message">加载文章数据失败：${escapeHtml(error.message)}</p>`;
+                }
+            });
+    });
+
+    function submitUpdate() {
+        const articleId = articleIdInput.value;
+        const title = titleInput.value.trim();
+        const content = contentTextarea.value; // Markdown 原文
+        const category = categoryInput.value.trim();
+
+        if (!title) { alert("文章标题不能为空！"); titleInput.focus(); return; }
+        if (!content.trim()) { alert("文章内容不能为空！"); contentTextarea.focus(); return; }
+
+        const formData = new URLSearchParams();
+        formData.append("articleId", articleId);
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("category", category);
+
+        fetch("UpdateArticleServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) { // 未授权或禁止访问 (非作者)
+                    return response.json().then(err => { throw new Error(err.error || '您无权修改此文章或未登录。'); });
+                }
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || `更新失败: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert(result.message || "操作完成");
+                if (result.success) {
+                    window.location.href = `my_articles.html`; // 或跳转到 article.html?id=${articleId}
+                }
+            })
+            .catch(error => {
+                console.error("更新文章失败：", error);
+                alert("更新文章失败：" + error.message);
+            });
+    }
+</script>
+</body>
+</html>

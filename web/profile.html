@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 掘金</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        body {
+            padding-top: 70px; /* For fixed navbar */
+            background-color: #f4f6f8;
+        }
+        .profile-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .profile-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .form-group input[type="file"] {
+            padding: 5px;
+        }
+        .avatar-preview-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #avatarPreview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #eee;
+            object-fit: cover; /* 保证图片不变形 */
+            display: block;
+            margin: 0 auto 10px;
+            background-color: #f0f0f0; /* 默认背景色 */
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.loading { /* 加载中提示样式 */
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+    </style>
+</head>
+<body>
+<nav class="main-nav" style="width:100%; position:fixed; top:0; left:0; z-index:1000; background: white; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+    <div class="nav-container" style="max-width: 1000px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+        <div class="nav-left" style="display: flex; align-items: center;">
+            <a class="logo" href="main.html" style="font-size: 22px; font-weight: bold; color: #007aff; text-decoration: none; margin-right: 20px;">掘金</a>
+            <div class="nav-menu">
+                <a href="main.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">首页</a>
+                <a href="publish.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">发布文章</a>
+                <a href="my_articles.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">我的文章</a>
+                <a href="profile.html" class="active" style="margin: 0 10px; color: #333; text-decoration: none; background-color: #e6f0ff; padding: 6px 10px; border-radius: 6px;">个人资料</a>
+            </div>
+        </div>
+        <div class="nav-right user-area" style="display: flex; align-items: center;">
+            <img id="navUserAvatarMain" src="default-avatar.png" alt="avatar" style="width:30px; height:30px; border-radius:50%; margin-right:8px; display:none;">
+            <a href="#" id="navUserNicknameMain" class="vip-link" style="text-decoration:none; color:#007aff;"></a>
+        </div>
+    </div>
+</nav>
+
+<div class="profile-container">
+    <h1 class="profile-title">个人资料管理</h1>
+    <div class="avatar-preview-container">
+        <img id="avatarPreview" src="default-avatar.png" alt="User Avatar">
+        <small>点击下方选择新头像 (支持JPG, PNG, GIF, 最大5MB)</small>
+    </div>
+
+    <form id="profileForm">
+        <div class="form-group">
+            <label for="phone">手机号 (不可修改)</label>
+            <input type="text" id="phone" name="phone" readonly>
+        </div>
+        <div class="form-group">
+            <label for="nickname">昵称</label>
+            <input type="text" id="nickname" name="nickname" required minlength="2" maxlength="20">
+        </div>
+        <div class="form-group">
+            <label for="avatarFile">修改头像</label>
+            <input type="file" id="avatarFile" name="avatarFile" accept="image/jpeg, image/png, image/gif">
+        </div>
+        <button type="button" class="submit-btn" onclick="updateProfile()">保存更改</button>
+    </form>
+    <div id="responseMessage" class="message" style="display:none;"></div>
+</div>
+
+<script>
+    // ---【核心修改】---
+    // 不再需要 appBaseUrl 变量
+    // const appBaseUrl = "http://localhost:8080/javaweb_Web_exploded";
+
+    function escapeHtml(unsafe) {
+        if (unsafe === null || typeof unsafe === 'undefined') return '';
+        return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserProfile();
+        document.getElementById('avatarFile').addEventListener('change', previewSelectedAvatar);
+        updateNavbarOnProfilePage();
+    });
+
+    function updateNavbarOnProfilePage() {
+        const userNickname = localStorage.getItem('userNickname');
+        const userAvatarUrl = localStorage.getItem('userAvatarUrl');
+        const navUserNicknameMain = document.getElementById('navUserNicknameMain');
+        const navUserAvatarMain = document.getElementById('navUserAvatarMain');
+
+        if (userNickname && navUserNicknameMain) {
+            navUserNicknameMain.textContent = `欢迎，${escapeHtml(userNickname)}！`;
+        } else if (navUserNicknameMain) {
+            navUserNicknameMain.innerHTML = '<a href="login.html" style="text-decoration:none; color:#007aff;">登录/注册</a>';
+        }
+
+        if (navUserAvatarMain) {
+            if (userAvatarUrl && userAvatarUrl !== 'default-avatar.png') {
+                navUserAvatarMain.src = userAvatarUrl; // 直接使用相对路径
+            } else {
+                navUserAvatarMain.src = 'default-avatar.png';
+            }
+            navUserAvatarMain.style.display = userNickname ? 'inline-block' : 'none';
+        }
+    }
+
+    function previewSelectedAvatar(event) {
+        const reader = new FileReader();
+        const avatarPreview = document.getElementById('avatarPreview');
+        reader.onload = function(){
+            avatarPreview.src = reader.result;
+        };
+        if (event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        } else {
+            const currentAvatarUrl = avatarPreview.dataset.currentAvatar || 'default-avatar.png';
+            // 如果用户取消选择，恢复到当前服务器上的头像
+            avatarPreview.src = currentAvatarUrl;
+        }
+    }
+
+    function loadUserProfile() {
+        // ---【核心修改】---
+        fetch('GetUserProfileServlet') // 使用相对路径
+            .then(response => {
+                if (response.status === 401) {
+                    alert("请先登录！");
+                    window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+                    throw new Error("User not logged in");
+                }
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || "获取用户信息失败"); });
+                }
+                return response.json();
+            })
+            .then(user => {
+                if (user) {
+                    document.getElementById('phone').value = user.phone || '';
+                    document.getElementById('nickname').value = user.nickname || '';
+                    const avatarPreview = document.getElementById('avatarPreview');
+
+                    let effectiveAvatarSrc = 'default-avatar.png';
+                    if (user.avatarUrl && user.avatarUrl !== 'default-avatar.png') {
+                        // 添加时间戳防止浏览器缓存旧头像
+                        effectiveAvatarSrc = `${user.avatarUrl}?t=${new Date().getTime()}`;
+                    }
+                    avatarPreview.src = effectiveAvatarSrc;
+                    avatarPreview.dataset.currentAvatar = effectiveAvatarSrc; // 存储当前服务端头像的完整URL或默认标记
+                }
+            })
+            .catch(error => {
+                console.error("加载用户资料失败:", error);
+                if(error.message !== "User not logged in") {
+                    displayResponseMessage("加载用户资料失败: " + error.message, true);
+                }
+            });
+    }
+
+    function updateProfile() {
+        const nicknameInput = document.getElementById('nickname');
+        const avatarFileInput = document.getElementById('avatarFile');
+
+        const nickname = nicknameInput.value.trim();
+
+        if (!nickname) { displayResponseMessage("昵称不能为空！", true); nicknameInput.focus(); return; }
+        if (nickname.length < 2 || nickname.length > 20) { displayResponseMessage("昵称长度应为 2 到 20 个字符！", true); nicknameInput.focus(); return; }
+
+        const formData = new FormData();
+        formData.append("nickname", nickname);
+        if (avatarFileInput.files[0]) {
+            if (avatarFileInput.files[0].size > 5 * 1024 * 1024) {
+                displayResponseMessage("头像文件不能超过5MB！", true);
+                return;
+            }
+            formData.append("avatarFile", avatarFileInput.files[0]);
+        }
+
+        displayResponseMessage("正在更新...", false, true);
+
+        // ---【核心修改】---
+        fetch('UpdateUserProfileServlet', { // 使用相对路径
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || `更新失败: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    displayResponseMessage(result.message || "资料更新成功！", false);
+                    localStorage.setItem('userNickname', result.nickname);
+                    const avatarPreview = document.getElementById('avatarPreview');
+
+                    let newEffectiveAvatarSrc = 'default-avatar.png';
+                    if (result.avatarUrl) {
+                        localStorage.setItem('userAvatarUrl', result.avatarUrl); // 存储相对路径
+                        newEffectiveAvatarSrc = `${result.avatarUrl}?t=${new Date().getTime()}`;
+                    } else {
+                        const oldStoredAvatar = localStorage.getItem('userAvatarUrl');
+                        if(oldStoredAvatar) {
+                            newEffectiveAvatarSrc = `${oldStoredAvatar}?t=${new Date().getTime()}`;
+                        } else {
+                            localStorage.removeItem('userAvatarUrl');
+                        }
+                    }
+                    avatarPreview.src = newEffectiveAvatarSrc;
+                    avatarPreview.dataset.currentAvatar = newEffectiveAvatarSrc;
+
+                    updateNavbarOnProfilePage(); // 更新此页面的导航栏
+                } else {
+                    displayResponseMessage(result.message || "更新失败，请稍后再试。", true);
+                }
+            })
+            .catch(error => {
+                console.error("更新资料失败:", error);
+                displayResponseMessage("更新资料时发生错误: " + error.message, true);
+            });
+    }
+
+    function displayResponseMessage(message, isError, isLoading = false) {
+        const responseMessageDiv = document.getElementById('responseMessage');
+        responseMessageDiv.textContent = message;
+        responseMessageDiv.style.display = 'block';
+        responseMessageDiv.className = 'message';
+        if (isLoading) {
+            responseMessageDiv.classList.add('loading');
+        } else if (isError) {
+            responseMessageDiv.classList.add('error');
+        } else {
+            responseMessageDiv.classList.add('success');
+        }
+        if(!isLoading){
+            setTimeout(() => {
+                responseMessageDiv.style.display = 'none';
+            }, 4000);
+        }
+    }
+</script>
+</body>
+</html>

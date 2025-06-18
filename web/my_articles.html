@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的文章 - 掘金</title>
+  <link rel="stylesheet" href="main.css"> <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <style>
+  body {
+    font-family: 'PingFang SC', 'Helvetica Neue', sans-serif; /* */
+    background-color: #f9f9f9; /* */
+    color: #333; /* */
+    margin: 0; /* */
+    padding-top: 60px; /* 固定导航栏高度 */ /* */
+  }
+  .page-outer-container {
+    padding: 20px 15px; /* */
+  }
+  .page-container {
+    max-width: 900px; /* */
+    margin-left: auto; /* */
+    margin-right: auto; /* */
+    background-color: #fff; /* */
+    padding: 20px 25px; /* */
+    border-radius: 8px; /* */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* */
+  }
+  .page-title {
+    font-size: 2em; /* */
+    color: #333; /* */
+    margin-bottom: 20px; /* */
+    border-bottom: 1px solid #eee; /* */
+    padding-bottom: 15px; /* */
+  }
+  .article-item { /* 用于包裹每篇文章及其操作按钮 */ /* */
+    border: 1px solid #e7e7e7; /* */
+    padding: 15px; /* */
+    margin-bottom: 15px; /* */
+    border-radius: 6px; /* */
+    background-color: #fff; /* */
+  }
+  .article-item h3 a { /* 保持与 main.html 一致 */ /* */
+    color: #007bff; /* */
+    text-decoration: none; /* */
+    font-size: 1.3em; /* */
+  }
+  .article-item h3 a:hover {
+    text-decoration: underline; /* */
+  }
+  .article-meta { /* 保持与 main.html 一致 */ /* */
+    font-size: 0.85em; /* */
+    color: #777; /* */
+    margin-top: 5px; /* */
+    margin-bottom: 10px; /* */
+  }
+  .article-meta .article-likes {
+    /* 同 main.html 中的样式或自定义 */
+  }
+  .article-summary-markdown-preview { /* 与 main.html 一致的摘要样式 */ /* */
+    max-height: 3.6em; /* */
+    overflow: hidden; /* */
+    position: relative; /* */
+    line-height: 1.8em; /* */
+    margin-bottom: 10px; /* */
+  }
+  .article-summary-markdown-preview::after {
+    content: "..."; /* */
+    position: absolute; /* */
+    bottom: 0; /* */
+    right: 0; /* */
+    padding-left: 25px; /* */
+    background: linear-gradient(to right, transparent, white 70%, white); /* */
+    font-weight: bold; /* */
+    color: #555; /* */
+  }
+  /* 摘要预览区内 Markdown 元素的紧凑样式, 从 main.html 复制 */
+  .article-summary-markdown-preview p { margin-top: 0; margin-bottom: 0.3em; } /* */
+  .article-summary-markdown-preview h1, .article-summary-markdown-preview h2, /* */
+  .article-summary-markdown-preview h3, .article-summary-markdown-preview h4, /* */
+  .article-summary-markdown-preview h5, .article-summary-markdown-preview h6 { /* */
+    font-size: 1.05em; margin-top: 0; margin-bottom: 0.2em; line-height: 1.4em; /* */
+  }
+
+  .article-actions button {
+    padding: 6px 12px; /* */
+    font-size: 0.9em; /* */
+    border-radius: 4px; /* */
+    cursor: pointer; /* */
+    border: 1px solid transparent; /* */
+    margin-right: 10px; /* */
+  }
+  .edit-btn {
+    background-color: #07a8ff; /* */
+    color: white; /* */
+    border-color: #07a8ff; /* */
+  }
+  .edit-btn:hover { background-color: #07a8ff; } /* */
+  .delete-btn {
+    background-color: #dc3545; /* 红色 */ /* */
+    color: white; /* */
+    border-color: #dc3545; /* */
+  }
+  .delete-btn:hover { background-color: #c82333; } /* */
+  .no-articles {
+    text-align: center; /* */
+    padding: 30px; /* */
+    color: #777; /* */
+  }
+</style>
+</head>
+<body>
+<nav class="main-nav" style="width:100%; position:fixed; top:0; left:0; z-index:1000; background: white; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+  <div class="nav-container" style="max-width: 1000px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+    <div class="nav-left" style="display: flex; align-items: center;">
+      <a class="logo" href="main.html" style="font-size: 22px; font-weight: bold; color: #007aff; text-decoration: none; margin-right: 20px;">掘金</a>
+      <div class="nav-menu">
+        <a href="main.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">首页</a>
+        <a href="publish.html" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px;">发布文章</a>
+        <a href="my_articles.html" class="active" style="margin: 0 10px; color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px; background-color: #e6f0ff;">我的文章</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-outer-container">
+  <div class="page-container">
+    <h1 class="page-title">我发布的文章</h1> <div id="myArticlesListContainer">
+    <p class="no-articles">正在加载您的文章...</p> </div>
+  </div>
+</div>
+
+<script>
+  function escapeHtml(unsafe) { //
+    if (unsafe === null || typeof unsafe === 'undefined') return ''; //
+    return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); //
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { //
+    loadUserArticles(); //
+  });
+
+  function loadUserArticles() { //
+    const container = document.getElementById('myArticlesListContainer'); //
+    container.innerHTML = '<p class="no-articles">正在加载您的文章...</p>'; //
+
+    fetch('GetUserArticlesServlet') // 确认Servlet路径 //
+            .then(response => {
+              if (response.status === 401) { // 未授权 //
+                container.innerHTML = '<p class="no-articles">您需要先<a href="login.html">登录</a>才能查看您的文章。</p>'; //
+                throw new Error('User not logged in'); // 阻止后续处理 //
+              }
+              if (!response.ok) { //
+                return response.json().then(err => { throw new Error(err.error || `获取文章失败: ${response.status}`); }); //
+              }
+              return response.json(); //
+            })
+            .then(articles => {
+              if (articles && articles.length > 0) { //
+                let articlesHtml = ''; //
+                articles.forEach(article => { //
+                  const markdownSnippet = article.contentSnippet || ""; //
+                  const renderedHtmlSnippet = marked.parse(markdownSnippet); //
+
+                  articlesHtml += `
+                <div class="article-item" id="article-item-${article.id}">
+                  <h3><a href="article.html?id=${article.id}">${escapeHtml(article.title)}</a></h3>
+                  <p class="article-meta">
+                    分类: ${article.category ? escapeHtml(article.category) : '无'} |
+                    发布于: ${article.publishDate ? escapeHtml(article.publishDate) : '未知'} |
+                    <span class="article-likes">赞: ${article.likesCount !== undefined ? article.likesCount : 0}</span> </p>
+                  <div class="article-summary-markdown-preview">
+                    ${renderedHtmlSnippet}
+                  </div>
+                  <div class="article-actions">
+                    <button class="edit-btn" onclick="editArticle(${article.id})">修改</button>
+                    <button class="delete-btn" onclick="deleteArticle(${article.id}, '${escapeHtml(article.title)}')">删除</button>
+                  </div>
+                </div>
+              `; //
+                });
+                container.innerHTML = articlesHtml; //
+              } else if (articles) { // articles 是空数组 //
+                container.innerHTML = '<p class="no-articles">您还没有发布任何文章。去 <a href="publish.html">发布一篇</a> 吧！</p>'; //
+              } else { // articles 是 null 或 undefined (可能是后端返回错误但未被catch) //
+                container.innerHTML = '<p class="no-articles">加载文章列表失败，数据异常。</p>'; //
+              }
+            })
+            .catch(error => {
+              console.error('加载用户文章失败:', error); //
+              if (error.message !== 'User not logged in') { // 避免重复显示登录提示 //
+                container.innerHTML = `<p class="no-articles">加载文章失败：${escapeHtml(error.message)}</p>`; //
+              }
+            });
+  }
+
+  function editArticle(articleId) { //
+    window.location.href = `edit_article.html?id=${articleId}`; //
+  }
+
+  function deleteArticle(articleId, articleTitle) { //
+    if (confirm(`您确定要删除文章《${escapeHtml(articleTitle)}》吗？此操作无法撤销。`)) { //
+      const formData = new URLSearchParams(); //
+      formData.append("articleId", articleId.toString()); //
+
+      fetch('DeleteArticleServlet', { // 确认Servlet路径 //
+        method: 'POST', //
+        headers: { //
+          'Content-Type': 'application/x-www-form-urlencoded' //
+        },
+        body: formData.toString() //
+      })
+              .then(response => {
+                if (response.status === 401 || response.status === 403) { // 未授权或禁止 //
+                  return response.json().then(err => { throw new Error(err.error || '您无权删除此文章或未登录。'); }); //
+                }
+                if (!response.ok) { //
+                  return response.json().then(err => { throw new Error(err.error || `删除失败: ${response.status}`); }); //
+                }
+                return response.json(); //
+              })
+              .then(result => {
+                alert(result.message || "操作完成"); //
+                if (result.success) { //
+                  const articleItemToRemove = document.getElementById(`article-item-${articleId}`); //
+                  if (articleItemToRemove) { //
+                    articleItemToRemove.remove(); //
+                  }
+                  const container = document.getElementById('myArticlesListContainer'); //
+                  if (container && !container.querySelector('.article-item')) { //
+                    container.innerHTML = '<p class="no-articles">您还没有发布任何文章。去 <a href="publish.html">发布一篇</a> 吧！</p>'; //
+                  }
+                }
+              })
+              .catch(error => {
+                console.error('删除文章失败:', error); //
+                alert('删除文章失败：' + error.message); //
+              });
+    }
+  }
+</script>
+</body>
+</html>

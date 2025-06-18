@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PublishArticleServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.PublishArticleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PublishArticleServlet</servlet-name>
+        <url-pattern>/PublishArticleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SearchArticleServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.SearchArticleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SearchArticleServlet</servlet-name>
+        <url-pattern>/SearchArticleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetArticlesByCategoryServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetArticlesByCategoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetArticlesByCategoryServlet</servlet-name>
+        <url-pattern>/GetArticlesByCategoryServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetArticleByIdServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetArticleByIdServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetArticleByIdServlet</servlet-name>
+        <url-pattern>/GetArticleByIdServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetUserArticlesServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetUserArticlesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetUserArticlesServlet</servlet-name>
+        <url-pattern>/GetUserArticlesServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UpdateArticleServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.UpdateArticleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateArticleServlet</servlet-name>
+        <url-pattern>/UpdateArticleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DeleteArticleServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.DeleteArticleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteArticleServlet</servlet-name>
+        <url-pattern>/DeleteArticleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AddCommentServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.AddCommentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddCommentServlet</servlet-name>
+        <url-pattern>/AddCommentServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetCommentsServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetCommentsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetCommentsServlet</servlet-name>
+        <url-pattern>/GetCommentsServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LikeArticleServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.LikeArticleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LikeArticleServlet</servlet-name>
+        <url-pattern>/LikeArticleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetRankedArticlesServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetRankedArticlesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetRankedArticlesServlet</servlet-name>
+        <url-pattern>/GetRankedArticlesServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetRankedAuthorsServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetRankedAuthorsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetRankedAuthorsServlet</servlet-name>
+        <url-pattern>/GetRankedAuthorsServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetUserProfileServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.GetUserProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetUserProfileServlet</servlet-name>
+        <url-pattern>/GetUserProfileServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UpdateUserProfileServlet</servlet-name>
+        <servlet-class>com.example.servlet.model.UpdateUserProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateUserProfileServlet</servlet-name>
+        <url-pattern>/UpdateUserProfileServlet</url-pattern>
+    </servlet-mapping>
+
+</web-app>
